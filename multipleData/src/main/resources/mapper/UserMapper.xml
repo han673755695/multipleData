@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.multipleData.dao.test1.UserMapper">
+	
+	<resultMap id="BaseResultMap"
+		type="com.example.multipleData.entity.User">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="age" property="age" jdbcType="INTEGER" />
+		<result column="create_date" property="createDate"
+			jdbcType="TIMESTAMP" />
+		<result column="update_date" property="updateDate"
+			jdbcType="TIMESTAMP" />
+		<result column="hobby" property="hobby" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	
+	<sql id="Base_Column_List">
+		id, name, age, email, password, create_date, update_date, hobby, status
+	</sql>
+	
+	
+	<select id="selectUserByNameAndPwd" resultMap="BaseResultMap"
+		parameterType="Map">
+		select
+		<include refid="Base_Column_List" />
+		from admin_user
+		where 1=1
+		<if test="username != null and username != '' ">
+			and name=#{username}
+		</if>
+		<if test="password != null and password != '' ">
+			and password=#{password}
+		</if>
+	</select>
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from admin_user
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+	
+	
+	<select id="selectBySelective" resultType="Map"
+		parameterType="Map">
+		select
+		<include refid="Base_Column_List" />
+		from admin_user
+		where 1=1
+		<if test="username != null and username != '' ">
+			and name like concat('%',#{username},'%')
+		</if>
+		<if test="start != null and start != '' ">
+			and <![CDATA[ DATE_FORMAT(create_date,'%Y-%m-%d') >= DATE_FORMAT(#{start},'%Y-%m-%d') ]]>
+		</if>
+		<if test="end != null and end != '' ">
+			and <![CDATA[ DATE_FORMAT(create_date,'%Y-%m-%d') <= DATE_FORMAT(#{end},'%Y-%m-%d') ]]>
+		</if>
+		<if test="currentNum != null">
+			limit #{currentNum},#{pageSize}
+		</if>
+	</select>
+	
+	<!-- 查询数量 -->
+	<select id="totalCount" resultType="Integer"
+		parameterType="Map">
+		select
+			count(id) totalCount
+		from admin_user
+		where 1=1
+		<if test="username != null and username != '' ">
+			and name like concat('%',#{username},'%')
+		</if>
+		<if test="start != null and start != '' ">
+			and <![CDATA[ DATE_FORMAT(create_date,'%Y-%m-%d') >= DATE_FORMAT(#{start},'%Y-%m-%d') ]]>
+		</if>
+		<if test="end != null and end != '' ">
+			and <![CDATA[ DATE_FORMAT(create_date,'%Y-%m-%d') <= DATE_FORMAT(#{end},'%Y-%m-%d') ]]>
+		</if>
+	</select>
+	
+	
+	
+	<update id="deleteByPrimaryKey" parameterType="list">
+		update admin_user
+		set `status` = '2'
+		where id in 
+		<foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</update>
+	
+	
+	<insert id="insert"
+		parameterType="com.example.multipleData.entity.User">
+		insert into admin_user (id, name, age, email, password,
+		create_date, update_date, hobby,
+		status)
+		values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+		#{age,jdbcType=INTEGER}, #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+		#{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{hobby,jdbcType=VARCHAR},
+		#{status,jdbcType=VARCHAR})
+	</insert>
+	
+	
+	<insert id="insertSelective"
+		parameterType="com.example.multipleData.entity.User">
+		insert into admin_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="age != null">
+				age,
+			</if>
+			<if test="email != null">
+				email,
+			</if>
+			<if test="password != null">
+				password,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="updateDate != null">
+				update_date,
+			</if>
+			<if test="hobby != null">
+				hobby,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="age != null">
+				#{age,jdbcType=INTEGER},
+			</if>
+			<if test="email != null">
+				#{email,jdbcType=INTEGER},
+			</if>
+			<if test="password != null">
+				#{password,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateDate != null">
+				#{updateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="hobby != null">
+				#{hobby,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	
+	
+	<update id="updateByPrimaryKeySelective"
+		parameterType="com.example.multipleData.entity.User">
+		update admin_user
+		<set>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="age != null">
+				age = #{age,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="hobby != null">
+				hobby = #{hobby,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+	
+	
+	<update id="updateByPrimaryKey"
+		parameterType="com.example.multipleData.entity.User">
+		update admin_user
+		set name = #{name,jdbcType=VARCHAR},
+		age = #{age,jdbcType=INTEGER},
+		create_date = #{createDate,jdbcType=TIMESTAMP},
+		update_date = #{updateDate,jdbcType=TIMESTAMP},
+		hobby = #{hobby,jdbcType=VARCHAR},
+		status = #{status,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+	
+	
+</mapper>
